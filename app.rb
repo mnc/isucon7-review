@@ -182,7 +182,7 @@ class App < Sinatra::Base
 
     not_counted_channe_ids = []
     channel_ids.each do |channel_id|
-      not_counted = res.none do |r|
+      not_counted = res.none? do |r|
         r['channel_id'] == channel_id
       end
       if not_counted
