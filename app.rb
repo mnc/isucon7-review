@@ -137,7 +137,7 @@ class App < Sinatra::Base
 
     max_message_id = rows.empty? ? 0 : rows.map { |row| row['id'] }.max
 
-    statement = db.prepare('select count(*) as cnt from message where channel_id = ? and id > ?')
+    statement = db.prepare('select count(*) as cnt from message where channel_id = ? and id < ?')
     row = statement.execute(channel_id, max_message_id).first
     statement.close
 
