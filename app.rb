@@ -119,7 +119,7 @@ class App < Sinatra::Base
 
     channel_id = params[:channel_id].to_i
     last_message_id = params[:last_message_id].to_i
-    statement = db.prepare('SELECT message.*, user.name as user_name, user.display_name as user_display_name, user.avatar_icon as user_avatar_icon FROM message INNER JOIN user ON message.user_id = user.id WHERE id > ? AND channel_id = ? ORDER BY id DESC LIMIT 100')
+    statement = db.prepare('SELECT message.*, user.name as user_name, user.display_name as user_display_name, user.avatar_icon as user_avatar_icon FROM message INNER JOIN user ON message.user_id = user.id WHERE message.id > ? AND channel_id = ? ORDER BY id DESC LIMIT 100')
     rows = statement.execute(last_message_id, channel_id).to_a
     statement.close
     response = []
