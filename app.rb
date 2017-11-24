@@ -400,6 +400,10 @@ class App < Sinatra::Base
     statement = db.prepare('INSERT INTO message (channel_id, user_id, content, created_at) VALUES (?, ?, ?, NOW())')
     messages = statement.execute(channel_id, user_id, content)
     statement.close
+
+    statement = db.prepare('update unread_count set count = count + 1 where id = ? and user_id = ?');
+    statement.execute(channel_id, user_id)
+    statement.close
     messages
   end
 
