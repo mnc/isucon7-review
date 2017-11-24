@@ -180,6 +180,31 @@ class App < Sinatra::Base
       res << r
     end
 
+    not_counted_channe_ids = []
+    channel_ids.each do |channel_id|
+      not_counted = res.none do |r|
+        r['channel_id'] == channel_id
+      end
+      if not_counted
+        not_counted_channe_ids << channel_id
+      end
+    end
+
+    place_holder = '?'
+    append_place_holder = ', ?'
+    (not_counted_channe_ids.size - 1).times do
+      place_holder << append_place_holder
+    end
+
+    statement = db.prepare("select channel_id, count(*) as cnt from message where channel_id in (#{place_holder}) group by channel_id")
+    rows = statement.execute(*channel_ids)
+    rows.each do |row|
+      r = {}
+      r['channel_id'] = row['channel_id']
+      r['unread'] = row['unread']
+      res << r
+    end
+
     content_type :json
     res.to_json
   end
