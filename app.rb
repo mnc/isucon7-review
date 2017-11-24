@@ -121,6 +121,7 @@ class App < Sinatra::Base
     last_message_id = params[:last_message_id].to_i
     statement = db.prepare('SELECT * FROM message WHERE id > ? AND channel_id = ? ORDER BY id DESC LIMIT 100')
     rows = statement.execute(last_message_id, channel_id).to_a
+    statement.close
     response = []
     rows.each do |row|
       r = {}
@@ -146,6 +147,7 @@ class App < Sinatra::Base
       'ON DUPLICATE KEY UPDATE count = ?',
     ].join)
     statement.execute(channel_id, unread_count, unread_count)
+    statement.close
 
     content_type :json
     response.to_json
