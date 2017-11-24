@@ -138,7 +138,7 @@ class App < Sinatra::Base
     max_message_id = rows.empty? ? 0 : rows.map { |row| row['id'] }.max
 
     statement = db.prepare('select count(*) from message where channel_id = ? and id > ?')
-    unread_count = statement.execute(channel_id, max_message_id)
+    row = statement.execute(channel_id, max_message_id
     statement.close
 
     statement = db.prepare([
@@ -146,7 +146,7 @@ class App < Sinatra::Base
       'VALUES (?, ?) ',
       'ON DUPLICATE KEY UPDATE count = ?',
     ].join)
-    statement.execute(channel_id, unread_count, unread_count)
+    statement.execute(channel_id, row['unread_count'], row['unread_count'])
     statement.close
 
     content_type :json
