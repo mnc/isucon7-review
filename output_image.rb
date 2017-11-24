@@ -1,4 +1,4 @@
-# bundle exec pry
+# /home/isucon/local/ruby/bin/bundle exec pry exec pry
 # require './app.rb'
 class ImageOutput
   PUBLIC_PATH = '/home/isucon/isubata/webapp/public/icons'

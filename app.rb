@@ -38,6 +38,7 @@ class App < Sinatra::Base
     db.query("DELETE FROM image WHERE id > 1001")
     db.query("DELETE FROM channel WHERE id > 10")
     db.query("DELETE FROM message WHERE id > 10000")
+    db.query("DELETE FROM unread_count")
     db.query("DELETE FROM haveread")
     204
   end
@@ -144,7 +145,7 @@ class App < Sinatra::Base
       'VALUES (?, ?) ',
       'ON DUPLICATE KEY UPDATE count = ?',
     ].join)
-    statement.execute(channel_id, unread_count)
+    statement.execute(channel_id, unread_count, unread_count)
 
     content_type :json
     response.to_json
