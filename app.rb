@@ -164,8 +164,13 @@ class App < Sinatra::Base
     rows = db.query('SELECT id FROM channel').to_a
     channel_ids = rows.map { |row| row['id'] }
 
-    statement = db.prepare('select count, channel_id from unread_count where channel_id in (?)')
-    rows = statement.execute(channel_ids.join(','))
+    place_holder = '?'
+    append_place_holder = ', ?'
+    (channel_ids.size - 1).each do
+      place_holder << append_place_holder
+    end
+    statement = db.prepare("select count, channel_id from unread_count where channel_id in (#{place_holder})")
+    rows = statement.execute(*channel_ids)
 
     res = []
     rows.each do |row|
