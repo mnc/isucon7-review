@@ -166,7 +166,6 @@ class App < Sinatra::Base
 
     statement = db.prepare('select count from unread_count where channel_id in (?)')
     rows = statement.execute(channel_ids.join(','))
-    statement.close
 
     res = []
     rows.each do |row|
