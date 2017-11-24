@@ -1,7 +1,7 @@
 # bundle exec pry
 # require './app.rb'
 class ImageOutput
-  PUBLIC_PATH = '/home/isucon/isubata/webapp/public/images'
+  PUBLIC_PATH = '/home/isucon/isubata/webapp/public/icons'
 
   def db
     @db_client ||= Mysql2::Client.new(
