@@ -134,12 +134,17 @@ class App < Sinatra::Base
     response.reverse!
 
     max_message_id = rows.empty? ? 0 : rows.map { |row| row['id'] }.max
+
+    statement = db.prepare('select count(*) from messages where channel_id = ? and id > ?')
+    unread_count = statement.execute(channel_id, max_message_id)
+    statement.close
+
     statement = db.prepare([
-      'INSERT INTO haveread (user_id, channel_id, message_id, updated_at, created_at) ',
-      'VALUES (?, ?, ?, NOW(), NOW()) ',
-      'ON DUPLICATE KEY UPDATE message_id = ?, updated_at = NOW()',
+      'INSERT INTO unread_count (channel_id, count) ',
+      'VALUES (?, ?) ',
+      'ON DUPLICATE KEY UPDATE count = ?',
     ].join)
-    statement.execute(user_id, channel_id, max_message_id, max_message_id)
+    statement.execute(channel_id, unread_count)
 
     content_type :json
     response.to_json
@@ -156,21 +161,15 @@ class App < Sinatra::Base
     rows = db.query('SELECT id FROM channel').to_a
     channel_ids = rows.map { |row| row['id'] }
 
+    statement = db.prepare('select count from unread_count where channel_id in (?)')
+    rows = statement.execute(channel_ids.join(','))
+    statement.close
+
     res = []
-    channel_ids.each do |channel_id|
-      statement = db.prepare('SELECT * FROM haveread WHERE user_id = ? AND channel_id = ?')
-      row = statement.execute(user_id, channel_id).first
-      statement.close
+    rows.each do |row|
       r = {}
-      r['channel_id'] = channel_id
-      r['unread'] = if row.nil?
-        statement = db.prepare('SELECT COUNT(*) as cnt FROM message WHERE channel_id = ?')
-        statement.execute(channel_id).first['cnt']
-      else
-        statement = db.prepare('SELECT COUNT(*) as cnt FROM message WHERE channel_id = ? AND ? < id')
-        statement.execute(channel_id, row['message_id']).first['cnt']
-      end
-      statement.close
+      r['channel_id'] = row['channel_id']
+      r['unread'] = row['count']
       res << r
     end
 
