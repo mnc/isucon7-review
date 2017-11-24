@@ -140,11 +140,11 @@ class App < Sinatra::Base
     statement.close
 
     statement = db.prepare([
-      'INSERT INTO unread_count (channel_id, count) ',
-      'VALUES (?, ?) ',
+      'INSERT INTO unread_count (user_id, channel_id, count) ',
+      'VALUES (?, ?, ?) ',
       'ON DUPLICATE KEY UPDATE count = ?',
     ].join)
-    statement.execute(channel_id, row['cnt'], row['cnt'])
+    statement.execute(user_id, channel_id, row['cnt'], row['cnt'])
     statement.close
 
     content_type :json
@@ -168,8 +168,8 @@ class App < Sinatra::Base
     (channel_ids.size - 1).times do
       place_holder << append_place_holder
     end
-    statement = db.prepare("select count, channel_id from unread_count where channel_id in (#{place_holder})")
-    rows = statement.execute(*channel_ids)
+    statement = db.prepare("select count, channel_id from unread_count where user_id = ? and channel_id in (#{place_holder})")
+    rows = statement.execute(user_id, *channel_ids)
 
     res = []
     rows.each do |row|
