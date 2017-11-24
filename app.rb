@@ -309,6 +309,8 @@ class App < Sinatra::Base
       statement = db.prepare('UPDATE user SET avatar_icon = ? WHERE id = ?')
       statement.execute(avatar_name, user['id'])
       statement.close
+      path = File.join(icons_dir, avatar_name)
+      File.binwrite(path, avatar_data) unless File.exists?(path)
     end
 
     if !display_name.nil? || !display_name.empty?
@@ -335,6 +337,10 @@ class App < Sinatra::Base
   end
 
   private
+
+  def icons_dir
+    @icons_dir ||= "/home/isucon/isubata/webapp/public/icons"
+  end
 
   def db
     return @db_client if defined?(@db_client)
