@@ -166,7 +166,7 @@ class App < Sinatra::Base
 
     place_holder = '?'
     append_place_holder = ', ?'
-    (channel_ids.size - 1).each do
+    (channel_ids.size - 1).times do
       place_holder << append_place_holder
     end
     statement = db.prepare("select count, channel_id from unread_count where channel_id in (#{place_holder})")
