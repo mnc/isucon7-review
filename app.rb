@@ -200,11 +200,11 @@ class App < Sinatra::Base
     end
 
     statement = db.prepare("select channel_id, count(*) as cnt from message where channel_id in (#{place_holder}) group by channel_id")
-    rows = statement.execute(*not_counted_channe_ids)
+    rows = statement.execute(*not_counted_channe_ids).to_a
     rows.each do |row|
       r = {}
       r['channel_id'] = row['channel_id']
-      r['unread'] = row['unread']
+      r['unread'] = row['cnt']
       res << r
     end
 
