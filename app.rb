@@ -164,6 +164,7 @@ class App < Sinatra::Base
     rows = db.query('SELECT id FROM channel').to_a
     channel_ids = rows.map { |row| row['id'] }
 
+    # unread_countレコードのあるchannel
     place_holder = '?'
     append_place_holder = ', ?'
     (channel_ids.size - 1).times do
@@ -180,6 +181,8 @@ class App < Sinatra::Base
       res << r
     end
 
+
+    # unread_countレコードの無いchannel
     not_counted_channe_ids = []
     channel_ids.each do |channel_id|
       not_counted = res.none? do |r|
@@ -197,7 +200,7 @@ class App < Sinatra::Base
     end
 
     statement = db.prepare("select channel_id, count(*) as cnt from message where channel_id in (#{place_holder}) group by channel_id")
-    rows = statement.execute(*channel_ids)
+    rows = statement.execute(*not_counted_channe_ids)
     rows.each do |row|
       r = {}
       r['channel_id'] = row['channel_id']
